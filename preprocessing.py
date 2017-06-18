@@ -2,41 +2,75 @@
 
 import numpy as np
 import json
+import MySQLdb
+from sklearn import preprocessing
+from bs4 import BeautifulSoup
+from langdetect import detect
+import spacy
+import en_core_web_sm
+import sys
+import pickle
+import os
 
 
 def load_yelp(alphabet):
     examples = []
     labels = []
-    with open('./yelp-review-dataset/yelp_academic_dataset_review.json') as f:
-        i = 0
-        for line in f:
-            review = json.loads(line)
-            stars = review["stars"]
-            text = review["text"]
-            if stars != 3:
-                text_end_extracted = extract_end(list(text.lower()))
+    db = MySQLdb.connect("10.249.71.213", "root", "root", "ai")
+    cursor = db.cursor()
+    previous_y = []
+    sql = "SELECT DISTINCT(sr_number),t1_final,t2_final ,subject,body FROM nice_text_source_data WHERE t2_final in ('Defect Appeal', \
+              'High Risk','Site Features - CCR','Selling Performance','VeRO - CCR','Bidding/Buying Items','Report a Member/Listing','Account Restriction', \
+              'Cancel Transaction','Logistics - CCR','Selling Limits - CCR','Listing Queries - CCR','Paying for Items','Seller Risk Management', \
+              'eBay Account Information - CCR','Shipping - CCR','Account Suspension','Buyer Protection Case Qs','Buyer Protect High ASP Claim', \
+              'Buyer Protection Appeal INR','eBay Fees - CCR','Completing a Sale - CCR')"
+    try:
+        cursor.execute(sql)
+        results = cursor.fetchall()
+
+    except:
+        sys.stdout.write("Error: unable to fecth data"+ '\n')
+
+    db.close()
+    i=0
+    for row in results:
+        text = (row[3] + ' ' + row[4]).decode('utf8', 'ignore')
+
+        try:
+            if text!='' and detect(text)=='en':
+                text_end_extracted = extract_end(list(row[3] + ' ' + row[4]))
                 padded = pad_sentence(text_end_extracted)
                 text_int8_repr = string_to_int8_conversion(padded, alphabet)
-                if stars == 1 or stars == 2:
-                    labels.append([1, 0])
-                    examples.append(text_int8_repr)
-                elif stars == 4 or stars == 5:
-                    labels.append([0, 1])
-                    examples.append(text_int8_repr)
-                i += 1
-                if i % 10000 == 0:
-                    print("Non-neutral instances processed: " + str(i))
+                previous_y.append(row[1] + '|' + row[2])
+                examples.append(text_int8_repr)
+                #x_text.append(clean_str(text))
+                i=i+1
+                sys.stdout.write("Value is %s" % i)
+                sys.stdout.write('\n')
+                #previous_y.append(row[1] + '|' + row[2])
+        except:
+            sys.stdout.write(row[0])
+
+    lb = preprocessing.LabelBinarizer()
+    labels = lb.fit_transform(list(previous_y))
+
+    f = open('y_target.pickle', 'wb')
+    pickle.dump(lb, f)
+    f.close()
+
+    sys.stdout.write(lb.inverse_transform(labels))
+
     return examples, labels
 
 
 def extract_end(char_seq):
-    if len(char_seq) > 1014:
-        char_seq = char_seq[-1014:]
+    if len(char_seq) > 20000:
+        char_seq = char_seq[-20000:]
     return char_seq
 
 
 def pad_sentence(char_seq, padding_char=" "):
-    char_seq_length = 1014
+    char_seq_length = 20000
     num_padding = char_seq_length - len(char_seq)
     new_char_seq = char_seq + [padding_char] * num_padding
     return new_char_seq

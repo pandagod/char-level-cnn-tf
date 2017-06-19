@@ -9,7 +9,7 @@ class CharCNN(object):
     based on the Character-level Convolutional Networks for Text Classification paper.
     """
     def __init__(self, num_classes=2, filter_sizes=(7, 7, 3, 3, 3, 3), num_filters_per_size=256,
-                 l2_reg_lambda=0.0, sequence_max_length=3000, num_quantized_chars=70):
+                 l2_reg_lambda=0.0, sequence_max_length=1014, num_quantized_chars=70):
 
         # Placeholders for input, output and dropout
         self.input_x = tf.placeholder(tf.float32, [None, num_quantized_chars, sequence_max_length, 1], name="input_x")
@@ -86,7 +86,7 @@ class CharCNN(object):
                 name="pool6")
 
         # ================ Layer 7 ================
-        num_features_total = 27392 * num_filters_per_size
+        num_features_total = 34 * num_filters_per_size
         h_pool_flat = tf.reshape(pooled, [-1, num_features_total])
 
         # Add dropout

@@ -70,7 +70,7 @@ with tf.Graph().as_default():
       log_device_placement=FLAGS.log_device_placement)
     sess = tf.Session(config=session_conf)
     with sess.as_default():
-        cnn = CharCNN(num_classes=y_train.shape[1],sequence_max_length=3000)
+        cnn = CharCNN(num_classes=y_train.shape[1],sequence_max_length=1014)
 
         # Define Training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)

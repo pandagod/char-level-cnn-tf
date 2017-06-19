@@ -64,13 +64,13 @@ def load_yelp(alphabet):
 
 
 def extract_end(char_seq):
-    if len(char_seq) > 3000:
-        char_seq = char_seq[-3000:]
+    if len(char_seq) > 1014:
+        char_seq = char_seq[-1014:]
     return char_seq
 
 
 def pad_sentence(char_seq, padding_char=" "):
-    char_seq_length = 3000
+    char_seq_length = 1014
     num_padding = char_seq_length - len(char_seq)
     new_char_seq = char_seq + [padding_char] * num_padding
     return new_char_seq

@@ -23,7 +23,7 @@ def load_yelp(alphabet):
               'High Risk','Site Features - CCR','Selling Performance','VeRO - CCR','Bidding/Buying Items','Report a Member/Listing','Account Restriction', \
               'Cancel Transaction','Logistics - CCR','Selling Limits - CCR','Listing Queries - CCR','Paying for Items','Seller Risk Management', \
               'eBay Account Information - CCR','Shipping - CCR','Account Suspension','Buyer Protection Case Qs','Buyer Protect High ASP Claim', \
-              'Buyer Protection Appeal INR','eBay Fees - CCR','Completing a Sale - CCR') limit 1000"
+              'Buyer Protection Appeal INR','eBay Fees - CCR','Completing a Sale - CCR')"
     try:
         cursor.execute(sql)
         results = cursor.fetchall()

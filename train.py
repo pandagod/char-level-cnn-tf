@@ -115,7 +115,7 @@ with tf.Graph().as_default():
         saver = tf.train.Saver(tf.global_variables())
 
         # Initialize all variables
-        sess.run(tf.global_variables_initializer(),max_to_keep=FLAGS.num_checkpoints)
+        sess.run(tf.global_variables_initializer())
 
         def train_step(x_batch, y_batch):
             """
